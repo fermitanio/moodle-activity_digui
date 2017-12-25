@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/digui/db" VERSION="20120122" COMMENT="XMLDB file for Moodle mod/digui"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="digui" COMMENT="Stores Digui activity configuration" NEXT="digui_subdiguis">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="course"/>
+		<FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Course digui activity belongs to. It's a system field, so if deleted an error may ocurre." PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT="Digui" SEQUENCE="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="intro"/>
+        <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="General introduction of the digui activity" PREVIOUS="name" NEXT="introformat"/>
+		<FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="intro" NEXT="title"/>
+		<FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="title of the book" PREVIOUS="introformat" NEXT="chapter"/>
+		<FIELD NAME="chapter" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="chapter of the book" PREVIOUS="title" NEXT="author1"/>
+		<FIELD NAME="author1" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="first author of the book" PREVIOUS="chapter" NEXT="author2"/>
+		<FIELD NAME="author2" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="second author of the book" PREVIOUS="author1" NEXT="editor"/>
+		<FIELD NAME="editor" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="editor of the book" PREVIOUS="author2" NEXT="publisher"/>
+		<FIELD NAME="publisher" TYPE="char" LENGTH="255" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="publisher of the book" PREVIOUS="editor" NEXT="edition"/>
+		<FIELD NAME="edition" TYPE="char" LENGTH="8" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="editor of the book" PREVIOUS="publisher" NEXT="style"/>
+		<FIELD NAME="style" TYPE="char" LENGTH="32" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="style of the book" PREVIOUS="edition" NEXT="genre"/>
+		<FIELD NAME="genre" TYPE="char" LENGTH="32" NOTNULL="false" DEFAULT="" SEQUENCE="false" COMMENT="style of the book" PREVIOUS="style" NEXT="synopsis"/>
+		<FIELD NAME="synopsis" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Synopsis of the digui activity" PREVIOUS="genre" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="synopsis" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" PREVIOUS="timecreated" NEXT="numpags"/>
+		<FIELD NAME="numpags" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Page number" PREVIOUS="timemodified" NEXT="diguimode"/>
+        <FIELD NAME="diguimode" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="collaborative" SEQUENCE="false" COMMENT="Digui mode (individual, collaborative)" PREVIOUS="numpags" NEXT="grademode"/>
+		<FIELD NAME="grademode" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Evaluation mode (traditional-assessment, peer-assessment)" PREVIOUS="diguimode" NEXT="selfassessment"/>
+		<FIELD NAME="selfassessment" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="If self-assessment is allowed" PREVIOUS="grademode" NEXT="format"/>
+		<FIELD NAME="format" TYPE="char" LENGTH="8" NOTNULL="true" DEFAULT="txt" SEQUENCE="false" COMMENT="Digui format: txt, html or pdf" PREVIOUS="selfassessment"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+	<INDEXES>
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="digui_subdiguis" COMMENT="Stores subdigui instances" PREVIOUS="digui" NEXT="digui_pages">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="diguiid"/>
+        <FIELD NAME="diguiid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Digui activity" PREVIOUS="id" NEXT="groupid"/>
+        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Group that owns this digui" PREVIOUS="diguiid" NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Owner of that subdigui" PREVIOUS="groupid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="diguifk"/>
+        <KEY NAME="diguifk" TYPE="foreign" FIELDS="diguiid" REFTABLE="digui" REFFIELDS="id" COMMENT="Foreign key to digui table" PREVIOUS="primary" NEXT="diguiidgroupiduserid"/>
+        <KEY NAME="diguiidgroupiduserid" TYPE="unique" FIELDS="diguiid, groupid, userid" COMMENT="Unique key" PREVIOUS="diguifk"/>
+      </KEYS>
+    </TABLE>
+	<TABLE NAME="digui_pages" COMMENT="Stores digui pages" PREVIOUS="digui_subdiguis" NEXT="digui_colors">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="diguiid"/>
+        <FIELD NAME="diguiid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Digui activity" PREVIOUS="id" NEXT="pagenum"/>
+		<FIELD NAME="pagenum" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Page number" PREVIOUS="diguiid" NEXT="cachedcontent"/>
+		<FIELD NAME="cachedcontent" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Cache digui content" PREVIOUS="pagenum" NEXT="notes"/>
+		<FIELD NAME="notes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Digui notes" PREVIOUS="cachedcontent" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Digui page creation timestamp" PREVIOUS="notes" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="page edition timestamp" PREVIOUS="timecreated" NEXT="timerendered"/>
+        <FIELD NAME="timerendered" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Last render timestamp" PREVIOUS="timemodified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="diguifk"/>
+		<KEY NAME="diguifk" TYPE="foreign" FIELDS="diguiid" REFTABLE="digui" REFFIELDS="id" COMMENT="Foreign key to digui table" PREVIOUS="primary" NEXT="diguiidpagenum"/>
+		<KEY NAME="diguiidpagenum" TYPE="unique" FIELDS="diguiid, pagenum" COMMENT="Unique key" PREVIOUS="diguifk"/>
+      </KEYS>
+    </TABLE>
+	<TABLE NAME="digui_colors" COMMENT="" PREVIOUS="digui_pages" NEXT="digui_colors_assignments">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="5" NOTNULL="true" SEQUENCE="true" NEXT="identifier"/>
+		<FIELD NAME="identifier" TYPE="int" LENGTH="5" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="backcolor"/>
+        <FIELD NAME="backcolor" TYPE="char" LENGTH="32" NOTNULL="true" DEFAULT="gray" SEQUENCE="false" COMMENT="" PREVIOUS="identifier" NEXT="forecolor"/>
+		<FIELD NAME="forecolor" TYPE="char" LENGTH="32" NOTNULL="true" DEFAULT="white" SEQUENCE="false" COMMENT="" PREVIOUS="backcolor"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="diguiname"/>
+		<KEY NAME="diguiname" TYPE="unique" FIELDS="backcolor, forecolor" COMMENT="Unique key" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+	<TABLE NAME="digui_colors_assignments" COMMENT="" PREVIOUS="digui_colors" NEXT="digui_spans">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="subdiguiid"/>
+		<FIELD NAME="subdiguiid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Subdigui instance of this page" PREVIOUS="id" NEXT="backcolor"/>
+		<FIELD NAME="backcolor" TYPE="char" LENGTH="32" NOTNULL="true" DEFAULT="gray" SEQUENCE="false" COMMENT="" PREVIOUS="subdiguiid" NEXT="forecolor"/>
+		<FIELD NAME="forecolor" TYPE="char" LENGTH="32" NOTNULL="true" DEFAULT="white" SEQUENCE="false" COMMENT="" PREVIOUS="backcolor"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="subdiguifk"/>
+        <KEY NAME="subdiguifk" TYPE="foreign" FIELDS="subdiguiid" REFTABLE="digui_subdiguis" REFFIELDS="id" COMMENT="Foreign key to subdigui table" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+	<TABLE NAME="digui_spans" COMMENT="" PREVIOUS="digui_colors_assignments" NEXT="digui_last_user_modification">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="pageversion"/>
+		<FIELD NAME="pageversion" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Version of the page" PREVIOUS="id" NEXT="diguiid"/>
+		<FIELD NAME="diguiid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Digui activity" PREVIOUS="pageversion" NEXT="subdiguiids"/>
+		<FIELD NAME="subdiguiids" TYPE="char" LENGTH="32" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Subdigui instance of this page" PREVIOUS="diguiid" NEXT="pagenum"/>
+		<FIELD NAME="pagenum" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Page number" PREVIOUS="subdiguiids" NEXT="start"/>
+		<FIELD NAME="start" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="pagenum" NEXT="end"/>
+		<FIELD NAME="end" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="start"/>
+	  </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="diguifk"/>
+		<KEY NAME="diguifk" TYPE="foreign" FIELDS="diguiid" REFTABLE="digui" REFFIELDS="id" COMMENT="Foreign key to digui table" PREVIOUS="primary"/>
+      </KEYS>
+    </TABLE>
+	<TABLE NAME="digui_last_user_modification" COMMENT="Last time a user modified a digui." PREVIOUS="digui_spans" NEXT="digui_page_version">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="subdiguiid"/>
+        <FIELD NAME="subdiguiid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Subdigui instance of this page" PREVIOUS="id" NEXT="pagenum"/>
+		<FIELD NAME="pagenum" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Page number" PREVIOUS="subdiguiid" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="page edition timestamp" PREVIOUS="pagenum"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="subdiguifk"/>
+		<KEY NAME="subdiguifk" TYPE="foreign" FIELDS="subdiguiid" REFTABLE="digui_subdiguis" REFFIELDS="id" COMMENT="Foreign key to subdigui table" PREVIOUS="primary" NEXT="diguiidpagenum"/>
+		<KEY NAME="diguiidpagenum" TYPE="unique" FIELDS="diguiid,pagenum" COMMENT="Unique key" PREVIOUS="subdiguifk"/>
+      </KEYS>
+    </TABLE>
+	<TABLE NAME="digui_page_version" COMMENT="History of digui pages changes." PREVIOUS="digui_last_user_modification">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="subdiguiid"/>
+		<FIELD NAME="subdiguiid" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Subdigui instance of this page" PREVIOUS="id" NEXT="pagenum"/>
+		<FIELD NAME="pagenum" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Page number" PREVIOUS="subdiguiid" NEXT="pageversion"/>
+		<FIELD NAME="pageversion" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Version of the page" PREVIOUS="pagenum"/>
+	  </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="subdiguifk"/>
+		<KEY NAME="subdiguifk" TYPE="foreign" FIELDS="subdiguiid" REFTABLE="digui_subdiguis" REFFIELDS="id" COMMENT="Foreign key to subdigui table" PREVIOUS="primary" NEXT="diguiidsubdiguiidpagenum"/>
+		<KEY NAME="diguiidsubdiguiidpagenum" TYPE="unique" FIELDS="diguiid,subdiguiid,pagenum" COMMENT="Unique key" PREVIOUS="subdiguifk"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
